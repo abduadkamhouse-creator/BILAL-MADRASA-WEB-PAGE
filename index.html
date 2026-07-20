@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Madrasa Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Design tokens — professional / corporate SaaS theme
+   Navy + slate, single restrained accent, generous whitespace.
+   ============================================================ */
+:root{
+  --navy:        #0F2A43;   /* primary / sidebar */
+  --navy-2:      #16385A;
+  --accent:      #2563EB;   /* interactive accent */
+  --accent-dark: #1D4ED8;
+  --bg:          #F3F5F8;   /* app background */
+  --card:        #FFFFFF;
+  --text:        #16202B;
+  --muted:       #6B7684;
+  --border:      #E3E7EC;
+  --success:     #0F9D63;
+  --success-bg:  #E5F7EE;
+  --danger:      #D6432E;
+  --danger-bg:   #FCEAE7;
+  --warn:        #B4770A;
+  --warn-bg:     #FCF3DF;
+  --radius:      10px;
+  --shadow:      0 1px 3px rgba(15,42,67,0.07), 0 1px 2px rgba(15,42,67,0.05);
+  --shadow-lg:   0 20px 45px rgba(15,42,67,0.18);
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; padding:0; }
+body{
+  background:var(--bg); color:var(--text);
+  font-family:'Inter',system-ui,-apple-system,Segoe UI,sans-serif;
+  min-height:100vh; -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{ font-weight:700; color:var(--text); letter-spacing:-.01em; margin:0; }
+a{ color:inherit; }
+button{ font-family:inherit; }
+
+/* ---------- brand mark ---------- */
+.brand-mark{ width:32px; height:32px; border-radius:8px; background:var(--accent); display:flex; align-items:center; justify-content:center; flex:none; }
+.brand-mark svg{ width:18px; height:18px; }
+
+/* ---------- login screen ---------- */
+.auth-wrap{
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  background:
+    linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 55%, #1B4A72 100%);
+  padding:24px;
+}
+.auth-card{
+  width:100%; max-width:400px; background:var(--card); border-radius:16px;
+  box-shadow:var(--shadow-lg); padding:38px 34px 30px;
+}
+.auth-card .brand-row{ display:flex; align-items:center; gap:10px; justify-content:center; margin-bottom:22px; }
+.auth-card .brand-row .app-name{ font-size:16px; font-weight:700; }
+.auth-card h1{ text-align:center; font-size:22px; margin-bottom:4px; }
+.auth-card .sub{ text-align:center; color:var(--muted); font-size:13.5px; margin-bottom:26px; }
+.field{ margin-bottom:16px; }
+.field label{ display:block; font-size:12.5px; font-weight:600; color:var(--text); margin-bottom:6px; }
+.field input, .field select, .field textarea{
+  width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px;
+  font-size:14px; background:#fff; color:var(--text); font-family:inherit;
+}
+.field input:focus, .field select:focus, .field textarea:focus{
+  outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(37,99,235,0.14);
+}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:10px 16px; border-radius:8px; border:none; cursor:pointer;
+  font-weight:600; font-size:13.5px; transition:background .12s ease, transform .12s ease;
+}
+.btn:active{ transform:translateY(1px); }
+.btn-primary{ background:var(--accent); color:#fff; }
+.btn-primary:hover{ background:var(--accent-dark); }
+.btn-ghost{ background:transparent; color:var(--text); border:1px solid var(--border); }
+.btn-ghost:hover{ border-color:var(--muted); }
+.btn-danger{ background:var(--danger-bg); color:var(--danger); }
+.btn-block{ width:100%; }
+.btn-sm{ padding:6px 11px; font-size:12.5px; border-radius:6px; }
+.error-msg{ background:var(--danger-bg); color:var(--danger); padding:10px 12px; border-radius:8px; font-size:13px; margin-bottom:14px; display:none; }
+.error-msg.show{ display:block; }
+.hint{ font-size:12px; color:var(--muted); text-align:center; margin-top:18px; line-height:1.6; border-top:1px solid var(--border); padding-top:16px; }
+
+/* ---------- app shell ---------- */
+.shell{ display:flex; min-height:100vh; }
+.sidebar{ width:248px; flex:none; background:var(--navy); color:#D7DEE7; padding:22px 16px; display:flex; flex-direction:column; }
+.sidebar .brand-row{ display:flex; align-items:center; gap:10px; padding:4px 8px 22px; }
+.sidebar .brand-row .app-name{ color:#fff; font-size:15px; font-weight:700; }
+.sidebar .brand-row .tag{ font-size:10.5px; color:#8FA3BD; letter-spacing:.6px; text-transform:uppercase; }
+.nav-item{
+  display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:7px;
+  color:#B9C4D3; font-size:13.5px; font-weight:500; cursor:pointer; margin-bottom:2px;
+}
+.nav-item svg{ width:17px; height:17px; flex:none; opacity:.9; }
+.nav-item:hover{ background:rgba(255,255,255,0.06); color:#fff; }
+.nav-item.active{ background:var(--accent); color:#fff; }
+.sidebar .spacer{ flex:1; }
+.sidebar .user-box{ border-top:1px solid rgba(255,255,255,0.10); padding-top:14px; }
+.sidebar .user-box .who{ font-size:13px; color:#fff; font-weight:600; margin-bottom:2px; }
+.sidebar .user-box .email{ font-size:11px; color:#8FA3BD; margin-bottom:12px; word-break:break-all; }
+
+.main{ flex:1; padding:28px 36px 60px; max-width:1180px; }
+.topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:26px; flex-wrap:wrap; gap:12px; }
+.topbar h1{ font-size:23px; }
+.topbar .date{ color:var(--muted); font-size:13px; }
+
+.panel{ display:none; }
+.panel.active{ display:block; }
+
+.grid{ display:grid; gap:16px; }
+.grid-4{ grid-template-columns:repeat(4,1fr); }
+.grid-3{ grid-template-columns:repeat(3,1fr); }
+@media (max-width:980px){ .grid-4{grid-template-columns:repeat(2,1fr);} .grid-3{grid-template-columns:repeat(2,1fr);} }
+
+.stat-card{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:17px 19px; box-shadow:var(--shadow); }
+.stat-card .label{ font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:7px; font-weight:600; }
+.stat-card .value{ font-size:26px; font-weight:700; }
+.stat-card .sub{ font-size:12px; color:var(--muted); margin-top:4px; }
+
+.card{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px 22px; box-shadow:var(--shadow); margin-bottom:18px; }
+.card-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:15px; flex-wrap:wrap; gap:10px; }
+.card-head h2{ font-size:16px; }
+.card-head .desc{ font-size:12.5px; color:var(--muted); margin-top:2px; }
+
+table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); padding:8px 10px; border-bottom:1.5px solid var(--border); font-weight:600; }
+td{ padding:10px 10px; border-bottom:1px solid var(--border); vertical-align:middle; }
+tr:last-child td{ border-bottom:none; }
+tr:hover td{ background:#FAFBFD; }
+
+.badge{ display:inline-block; padding:3px 10px; border-radius:6px; font-size:11.5px; font-weight:600; }
+.badge-success{ background:var(--success-bg); color:var(--success); }
+.badge-danger{ background:var(--danger-bg); color:var(--danger); }
+.badge-warn{ background:var(--warn-bg); color:var(--warn); }
+.badge-muted{ background:#EEF0F3; color:var(--muted); }
+
+.form-row{ display:flex; gap:14px; flex-wrap:wrap; }
+.form-row .field{ flex:1; min-width:160px; }
+
+.att-btn{ width:34px; height:34px; border-radius:7px; border:1px solid var(--border); background:#fff; cursor:pointer; font-size:14px; color:var(--muted); font-weight:700; }
+.att-btn.p.on{ background:var(--success); color:#fff; border-color:var(--success); }
+.att-btn.a.on{ background:var(--danger); color:#fff; border-color:var(--danger); }
+.att-btn.l.on{ background:var(--warn); color:#fff; border-color:var(--warn); }
+
+.empty{ text-align:center; padding:36px 20px; color:var(--muted); font-size:13.5px; }
+
+.toast{ position:fixed; bottom:22px; right:22px; background:var(--navy); color:#fff; padding:12px 18px; border-radius:8px; box-shadow:var(--shadow-lg); font-size:13px; transform:translateY(16px); opacity:0; pointer-events:none; transition:all .22s ease; z-index:999; }
+.toast.show{ transform:translateY(0); opacity:1; }
+.toast.err{ background:var(--danger); }
+
+.modal-bg{ position:fixed; inset:0; background:rgba(15,42,67,0.5); display:none; align-items:center; justify-content:center; z-index:900; padding:20px; }
+.modal-bg.show{ display:flex; }
+.modal{ background:#fff; border-radius:12px; max-width:460px; width:100%; padding:24px 24px 20px; box-shadow:var(--shadow-lg); max-height:88vh; overflow:auto; }
+.modal h3{ margin:0 0 16px; font-size:17px; }
+.modal .close-x{ float:right; cursor:pointer; color:var(--muted); font-size:19px; }
+
+.loader{ display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+.file-chip{ display:inline-flex; align-items:center; gap:6px; background:var(--bg); border:1px solid var(--border); padding:4px 9px; border-radius:20px; font-size:12px; }
+.hidden{ display:none !important; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     LOGIN
+     ============================================================ -->
+<div class="auth-wrap" id="authScreen">
+  <div class="auth-card">
+    <div class="brand-row">
+      <div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg></div>
+      <div class="app-name">Madrasa Manager</div>
+    </div>
+    <h1>Sign in</h1>
+    <div class="sub">Enter your dashboard credentials</div>
+    <div id="errorBox" class="error-msg"></div>
+    <form id="loginForm">
+      <div class="field"><label for="email">Email</label><input type="email" id="email" placeholder="you@example.com" required autocomplete="username"></div>
+      <div class="field"><label for="password">Password</label><input type="password" id="password" placeholder="••••••••" required autocomplete="current-password"></div>
+      <button type="submit" class="btn btn-primary btn-block" id="loginBtn"><span id="loginBtnText">Sign In</span></button>
+    </form>
+    <div class="hint">Teachers and students: use the email &amp; password your admin issued you.<br>First admin account is created directly in Firebase — see the setup guide in this file's comments.</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     ADMIN DASHBOARD
+     ============================================================ -->
+<div class="shell hidden" id="appAdmin">
+  <aside class="sidebar">
+    <div class="brand-row"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg></div><div><div class="app-name">Madrasa</div><div class="tag">Admin</div></div></div>
+    <div class="nav-item active" data-target="panel-a-overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Overview</div>
+    <div class="nav-item" data-target="panel-a-teachers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Teachers</div>
+    <div class="nav-item" data-target="panel-a-students"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>Students</div>
+    <div class="nav-item" data-target="panel-a-attendance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg>Attendance</div>
+    <div class="nav-item" data-target="panel-a-fees"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 2.5-1.5c1.4 0 2.5.9 2.5 2s-1.1 1.8-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2A2.5 2.5 0 0 0 15 13.5"/></svg>Fees</div>
+    <div class="nav-item" data-target="panel-a-homework"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><path d="M14 4v5h5M8 13h8M8 17h5"/></svg>Homework</div>
+    <div class="spacer"></div>
+    <div class="user-box"><div class="who" id="aWhoName">—</div><div class="email" id="aWhoEmail">—</div><button class="btn btn-ghost btn-sm btn-block" id="aLogoutBtn" style="color:#EFEAE0;border-color:rgba(255,255,255,0.25)">Sign Out</button></div>
+  </aside>
+  <main class="main">
+    <div class="topbar"><h1 id="aPageTitle">Overview</h1><div class="date" id="aDateNow"></div></div>
+
+    <section class="panel active" id="panel-a-overview">
+      <div class="grid grid-4" id="aStatGrid"></div>
+      <div class="card"><div class="card-head"><h2>Recent Fee Payments</h2></div>
+        <table><thead><tr><th>Student</th><th>Class</th><th>Month</th><th>Amount</th><th>Date</th></tr></thead><tbody id="recentFeesBody"></tbody></table>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-a-teachers">
+      <div class="card">
+        <div class="card-head"><div><h2>Teachers</h2><div class="desc">Create login credentials for teaching staff</div></div><button class="btn btn-primary" id="openAddTeacher">+ Add Teacher</button></div>
+        <table><thead><tr><th>Name</th><th>Email</th><th>Classes</th><th>Phone</th><th></th></tr></thead><tbody id="teachersBody"></tbody></table>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-a-students">
+      <div class="card">
+        <div class="card-head"><div><h2>Students</h2><div class="desc">Register students and issue their portal login</div></div><button class="btn btn-primary" id="openAddStudent">+ Register Student</button></div>
+        <div class="form-row" style="margin-bottom:14px;"><div class="field" style="max-width:220px;"><label>Filter by class</label><select id="studentClassFilter"><option value="">All classes</option></select></div></div>
+        <table><thead><tr><th>Name</th><th>Class</th><th>Guardian</th><th>Phone</th><th>Fee Status</th><th></th></tr></thead><tbody id="studentsBody"></tbody></table>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-a-attendance">
+      <div class="card">
+        <div class="card-head"><div><h2>Attendance Overview</h2><div class="desc">Read-only — teachers mark daily attendance from their dashboard</div></div><div class="field" style="max-width:220px;margin:0;"><select id="attClassFilterA"><option value="">All classes</option></select></div></div>
+        <table><thead><tr><th>Class</th><th>Date</th><th>Present</th><th>Absent</th><th>Leave</th><th>%</th></tr></thead><tbody id="attendanceBody"></tbody></table>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-a-fees">
+      <div class="card">
+        <div class="card-head"><div><h2>Fee Collection</h2><div class="desc">Record and track monthly fee payments</div></div><button class="btn btn-primary" id="openCollectFee">+ Collect Fee</button></div>
+        <div class="form-row" style="margin-bottom:14px;"><div class="field" style="max-width:220px;"><label>Month</label><input type="month" id="feeMonthFilter"></div></div>
+        <table><thead><tr><th>Student</th><th>Class</th><th>Month</th><th>Amount</th><th>Status</th><th>Paid On</th></tr></thead><tbody id="feesBody"></tbody></table>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-a-homework">
+      <div class="card"><div class="card-head"><div><h2>Homework Log</h2><div class="desc">Read-only view of assignments posted by teachers</div></div></div>
+        <table><thead><tr><th>Class</th><th>Subject</th><th>Title</th><th>Due</th><th>Posted By</th></tr></thead><tbody id="homeworkBodyA"></tbody></table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============================================================
+     TEACHER DASHBOARD
+     ============================================================ -->
+<div class="shell hidden" id="appTeacher">
+  <aside class="sidebar">
+    <div class="brand-row"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg></div><div><div class="app-name">Madrasa</div><div class="tag">Teacher</div></div></div>
+    <div class="nav-item active" data-target="panel-t-attendance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg>Take Attendance</div>
+    <div class="nav-item" data-target="panel-t-homework"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><path d="M14 4v5h5M8 13h8M8 17h5"/></svg>Homework</div>
+    <div class="nav-item" data-target="panel-t-students"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>My Students</div>
+    <div class="spacer"></div>
+    <div class="user-box"><div class="who" id="tWhoName">—</div><div class="email" id="tWhoEmail">—</div><button class="btn btn-ghost btn-sm btn-block" id="tLogoutBtn" style="color:#EFEAE0;border-color:rgba(255,255,255,0.25)">Sign Out</button></div>
+  </aside>
+  <main class="main">
+    <div class="topbar"><h1 id="tPageTitle">Take Attendance</h1><div class="date" id="tDateNow"></div></div>
+
+    <section class="panel active" id="panel-t-attendance">
+      <div class="card">
+        <div class="card-head"><div><h2>Mark Today's Attendance</h2><div class="desc" id="attDateLabel"></div></div><div class="form-row" style="margin:0;"><select id="attClassSelect" style="min-width:190px;"></select><input type="date" id="attDate"></div></div>
+        <table><thead><tr><th>Student</th><th style="text-align:center;">Present</th><th style="text-align:center;">Absent</th><th style="text-align:center;">Leave</th></tr></thead><tbody id="attBody"></tbody></table>
+        <div style="margin-top:16px;"><button class="btn btn-primary" id="saveAttBtn">Save Attendance</button></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-t-homework">
+      <div class="card">
+        <div class="card-head"><div><h2>Post Homework</h2><div class="desc">Assign work to one of your classes</div></div></div>
+        <form id="homeworkForm">
+          <div class="form-row"><div class="field"><label>Class</label><select required id="hwClass"></select></div><div class="field"><label>Subject</label><select required id="hwSubject"></select></div></div>
+          <div class="field"><label>Title</label><input required id="hwTitle" type="text" placeholder="e.g. Surah Al-Mulk memorisation"></div>
+          <div class="field"><label>Details</label><textarea id="hwDesc" rows="3" placeholder="Instructions for students..."></textarea></div>
+          <div class="form-row"><div class="field"><label>Due Date</label><input type="date" id="hwDue"></div><div class="field"><label>Attachment (optional)</label><input type="file" id="hwFile"></div></div>
+          <button type="submit" class="btn btn-primary" id="hwSubmitBtn">Post Homework</button>
+        </form>
+      </div>
+      <div class="card"><div class="card-head"><h2>Posted Homework</h2></div>
+        <table><thead><tr><th>Class</th><th>Subject</th><th>Title</th><th>Due</th><th>File</th></tr></thead><tbody id="hwBodyT"></tbody></table>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-t-students">
+      <div class="card">
+        <div class="card-head"><div><h2>My Students</h2></div><select id="studClassFilter" style="max-width:210px;"></select></div>
+        <table><thead><tr><th>Name</th><th>Class</th><th>Guardian</th><th>Phone</th></tr></thead><tbody id="studBody"></tbody></table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============================================================
+     STUDENT PORTAL
+     ============================================================ -->
+<div class="shell hidden" id="appStudent">
+  <aside class="sidebar">
+    <div class="brand-row"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg></div><div><div class="app-name">Madrasa</div><div class="tag">Student</div></div></div>
+    <div class="nav-item active" data-target="panel-s-overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Overview</div>
+    <div class="nav-item" data-target="panel-s-attendance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>My Attendance</div>
+    <div class="nav-item" data-target="panel-s-homework"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><path d="M14 4v5h5M8 13h8M8 17h5"/></svg>Homework</div>
+    <div class="nav-item" data-target="panel-s-fees"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 2.5-1.5c1.4 0 2.5.9 2.5 2s-1.1 1.8-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2A2.5 2.5 0 0 0 15 13.5"/></svg>Fee Status</div>
+    <div class="spacer"></div>
+    <div class="user-box"><div class="who" id="sWhoName">—</div><div class="email" id="sWhoEmail">—</div><button class="btn btn-ghost btn-sm btn-block" id="sLogoutBtn" style="color:#EFEAE0;border-color:rgba(255,255,255,0.25)">Sign Out</button></div>
+  </aside>
+  <main class="main">
+    <div class="topbar"><h1 id="sPageTitle">Overview</h1><div class="date" id="sDateNow"></div></div>
+
+    <section class="panel active" id="panel-s-overview">
+      <div class="grid grid-3" id="sStatGrid"></div>
+      <div class="card"><div class="card-head"><h2>Upcoming Homework</h2></div>
+        <table><thead><tr><th>Subject</th><th>Title</th><th>Due</th></tr></thead><tbody id="upcomingHwBody"></tbody></table>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-s-attendance">
+      <div class="card"><div class="card-head"><div><h2>My Attendance</h2><div class="desc" id="classLabelS"></div></div></div>
+        <table><thead><tr><th>Date</th><th>Status</th></tr></thead><tbody id="sAttBody"></tbody></table>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-s-homework">
+      <div class="card"><div class="card-head"><h2>All Homework</h2></div>
+        <table><thead><tr><th>Subject</th><th>Title</th><th>Details</th><th>Due</th><th>File</th></tr></thead><tbody id="sHwBody"></tbody></table>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-s-fees">
+      <div class="card"><div class="card-head"><h2>Fee Payment History</h2></div>
+        <table><thead><tr><th>Month</th><th>Amount</th><th>Status</th><th>Paid On</th></tr></thead><tbody id="sFeeBody"></tbody></table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============================================================
+     MODALS (admin only)
+     ============================================================ -->
+<div class="modal-bg" id="teacherModalBg">
+  <div class="modal">
+    <span class="close-x" data-close="teacherModalBg">&times;</span>
+    <h3>Add Teacher</h3>
+    <form id="teacherForm">
+      <div class="field"><label>Full Name</label><input required id="tName" type="text"></div>
+      <div class="field"><label>Email (used to log in)</label><input required id="tEmail" type="email"></div>
+      <div class="field"><label>Temporary Password</label><input required id="tPass" type="text" minlength="6" placeholder="min. 6 characters"></div>
+      <div class="field"><label>Phone</label><input id="tPhone" type="text"></div>
+      <div class="field"><label>Assigned Classes</label><select id="tClasses" multiple size="4"></select></div>
+      <button type="submit" class="btn btn-primary btn-block" id="teacherSubmitBtn">Create Teacher Account</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal-bg" id="studentModalBg">
+  <div class="modal">
+    <span class="close-x" data-close="studentModalBg">&times;</span>
+    <h3>Register Student</h3>
+    <form id="studentForm">
+      <div class="field"><label>Student Name</label><input required id="sNameField" type="text"></div>
+      <div class="field"><label>Class</label><select required id="sClass"></select></div>
+      <div class="form-row"><div class="field"><label>Guardian Name</label><input id="sGuardian" type="text"></div><div class="field"><label>Guardian Phone</label><input id="sPhone" type="text"></div></div>
+      <div class="field" style="margin-top:6px;"><label style="color:var(--muted);">Portal login (optional)</label></div>
+      <div class="field"><label>Login Email</label><input id="sEmailField" type="email" placeholder="leave blank for no portal access"></div>
+      <div class="field"><label>Temporary Password</label><input id="sPassField" type="text" minlength="6"></div>
+      <button type="submit" class="btn btn-primary btn-block" id="studentSubmitBtn">Register Student</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal-bg" id="feeModalBg">
+  <div class="modal">
+    <span class="close-x" data-close="feeModalBg">&times;</span>
+    <h3>Collect Fee</h3>
+    <form id="feeForm">
+      <div class="field"><label>Student</label><select required id="fStudent"></select></div>
+      <div class="form-row"><div class="field"><label>Month</label><input required type="month" id="fMonth"></div><div class="field"><label>Amount</label><input required type="number" min="0" id="fAmount"></div></div>
+      <button type="submit" class="btn btn-primary btn-block" id="feeSubmitBtn">Mark as Paid</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
+     FIREBASE SETUP
+     1. Firebase Console → enable Auth (Email/Password), Firestore, Storage
+     2. Project Settings → Your apps → Web app → copy config below
+     3. Publish Firestore/Storage rules (see README you already have,
+        or ask for them again) so roles can't read each other's data
+     4. Create your first ADMIN by hand in Firebase Console:
+        Authentication → Add user → copy the UID →
+        Firestore → users/{UID} → { role:"admin", name:"...", email:"..." }
+     ============================================================ -->
+<script type="module">
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, deleteDoc,
+  collection, addDoc, getDocs, query, where, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getStorage, ref, uploadBytes, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+// ---- PASTE YOUR FIREBASE CONFIG HERE ----
+const firebaseConfig = {
+  apiKey: "PASTE_YOUR_API_KEY",
+  authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
+  projectId: "PASTE_YOUR_PROJECT_ID",
+  storageBucket: "PASTE_YOUR_PROJECT.appspot.com",
+  messagingSenderId: "PASTE_YOUR_SENDER_ID",
+  appId: "PASTE_YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+function getSecondaryAuth() {
+  const name = "Secondary";
+  const existing = getApps().find(a => a.name === name);
+  return getAuth(existing || initializeApp(firebaseConfig, name));
+}
+
+// ---- shared config / helpers ----
+const CLASSES = [
+  "Hifz - Beginner", "Hifz - Intermediate", "Hifz - Advanced",
+  "Nazira Class 1", "Nazira Class 2",
+  "Aalim Year 1", "Aalim Year 2", "Aalim Year 3"
+];
+const SUBJECTS = [
+  "Quran (Hifz/Nazira)", "Tajweed", "Arabic", "Fiqh", "Hadith",
+  "Aqeedah", "Islamic History", "Urdu/Language", "General Studies"
+];
+
+function toast(msg, isErr = false) {
+  let el = document.getElementById("toast");
+  if (!el) { el = document.createElement("div"); el.id = "toast"; el.className = "toast"; document.body.appendChild(el); }
+  el.textContent = msg;
+  el.className = "toast show" + (isErr ? " err" : "");
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => el.classList.remove("show"), 3200);
+}
+function todayStr() { return new Date().toISOString().slice(0, 10); }
+function fmtDate(d) { return new Date(d).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }); }
+function monthKey(d = new Date()) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`; }
+function emptyRow(colspan, text) { return `<tr><td colspan="${colspan}" class="empty">${text}</td></tr>`; }
+function openModal(id) { document.getElementById(id).classList.add("show"); }
+function closeModal(id) { document.getElementById(id).classList.remove("show"); }
+document.querySelectorAll("[data-close]").forEach(x => x.onclick = () => closeModal(x.dataset.close));
+
+function wireNav(root) {
+  root.querySelectorAll(".nav-item").forEach(item => {
+    item.addEventListener("click", () => {
+      root.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
+      root.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+      item.classList.add("active");
+      document.getElementById(item.dataset.target).classList.add("active");
+      root.querySelector("h1[id$='PageTitle']").textContent = item.textContent.trim();
+    });
+  });
+}
+
+// ================================================================
+// AUTH / ROUTING
+// ================================================================
+const loginForm = document.getElementById("loginForm");
+const errorBox = document.getElementById("errorBox");
+const loginBtn = document.getElementById("loginBtn");
+const loginBtnText = document.getElementById("loginBtnText");
+
+loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  errorBox.classList.remove("show");
+  loginBtn.disabled = true; loginBtnText.innerHTML = '<span class="loader"></span>';
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (err) {
+    console.error(err);
+    errorBox.textContent = err.code === "auth/too-many-requests" ? "Too many attempts. Try again later." : "Sign in failed. Check your email and password.";
+    errorBox.classList.add("show");
+  } finally {
+    loginBtn.disabled = false; loginBtnText.textContent = "Sign In";
+  }
+});
+
+let booted = { admin: false, teacher: false, student: false };
+
+onAuthStateChanged(auth, async (user) => {
+  const authScreen = document.getElementById("authScreen");
+  const shells = { admin: document.getElementById("appAdmin"), teacher: document.getElementById("appTeacher"), student: document.getElementById("appStudent") };
+  Object.values(shells).forEach(s => s.classList.add("hidden"));
+
+  if (!user) { authScreen.classList.remove("hidden"); return; }
+
+  const snap = await getDoc(doc(db, "users", user.uid));
+  if (!snap.exists()) {
+    errorBox.textContent = "No profile found for this account. Ask your admin to check your access.";
+    errorBox.classList.add("show");
+    authScreen.classList.remove("hidden");
+    await signOut(auth);
+    return;
+  }
+  const profile = { uid: user.uid, email: user.email, ...snap.data() };
+  const role = profile.role;
+  if (!shells[role]) { authScreen.classList.remove("hidden"); return; }
+
+  authScreen.classList.add("hidden");
+  shells[role].classList.remove("hidden");
+
+  if (role === "admin" && !booted.admin) { booted.admin = true; initAdmin(profile); }
+  if (role === "teacher" && !booted.teacher) { booted.teacher = true; initTeacher(profile); }
+  if (role === "student" && !booted.student) { booted.student = true; initStudent(profile); }
+});
+
+["aLogoutBtn", "tLogoutBtn", "sLogoutBtn"].forEach(id => {
+  document.getElementById(id).addEventListener("click", () => signOut(auth));
+});
+
+// ================================================================
+// ADMIN
+// ================================================================
+function initAdmin(ME) {
+  document.getElementById("aWhoName").textContent = ME.name || "Admin";
+  document.getElementById("aWhoEmail").textContent = ME.email;
+  document.getElementById("aDateNow").textContent = new Date().toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+  wireNav(document.getElementById("appAdmin"));
+
+  ["tClasses", "sClass", "studentClassFilter", "attClassFilterA"].forEach(id => {
+    const el = document.getElementById(id);
+    CLASSES.forEach(c => { const o = document.createElement("option"); o.value = c; o.textContent = c; el.appendChild(o); });
+  });
+
+  let CACHE = { teachers: [], students: [], fees: [], attendance: [], homework: [] };
+
+  document.getElementById("openAddTeacher").onclick = () => openModal("teacherModalBg");
+  document.getElementById("openAddStudent").onclick = () => openModal("studentModalBg");
+  document.getElementById("openCollectFee").onclick = () => { populateFeeStudentSelect(); openModal("feeModalBg"); };
+  document.getElementById("teacherForm").addEventListener("submit", onCreateTeacher);
+  document.getElementById("studentForm").addEventListener("submit", onCreateStudent);
+  document.getElementById("feeForm").addEventListener("submit", onCollectFee);
+  document.getElementById("studentClassFilter").addEventListener("change", renderStudents);
+  document.getElementById("attClassFilterA").addEventListener("change", renderAttendance);
+  document.getElementById("feeMonthFilter").addEventListener("change", renderFees);
+  document.getElementById("feeMonthFilter").value = monthKey();
+
+  async function refreshAll() {
+    const usersSnap = await getDocs(collection(db, "users"));
+    CACHE.teachers = []; CACHE.students = [];
+    usersSnap.forEach(d => {
+      const data = { id: d.id, ...d.data() };
+      if (data.role === "teacher") CACHE.teachers.push(data);
+      if (data.role === "student") CACHE.students.push(data);
+    });
+    CACHE.fees = (await getDocs(query(collection(db, "fees"), orderBy("paidOn", "desc")))).docs.map(d => ({ id: d.id, ...d.data() }));
+    CACHE.attendance = (await getDocs(query(collection(db, "attendance"), orderBy("date", "desc")))).docs.map(d => ({ id: d.id, ...d.data() }));
+    CACHE.homework = (await getDocs(query(collection(db, "homework"), orderBy("createdAt", "desc")))).docs.map(d => ({ id: d.id, ...d.data() }));
+    renderOverview(); renderTeachers(); renderStudents(); renderFees(); renderAttendance(); renderHomework();
+  }
+
+  function renderOverview() {
+    const thisMonth = monthKey();
+    const collectedThisMonth = CACHE.fees.filter(f => f.month === thisMonth).reduce((s, f) => s + Number(f.amount || 0), 0);
+    const dueCount = Math.max(CACHE.students.length - CACHE.fees.filter(f => f.month === thisMonth).length, 0);
+    document.getElementById("aStatGrid").innerHTML = [
+      { label: "Total Students", value: CACHE.students.length },
+      { label: "Total Teachers", value: CACHE.teachers.length },
+      { label: "Fees Collected — " + thisMonth, value: "₹" + collectedThisMonth.toLocaleString() },
+      { label: "Pending This Month", value: dueCount + " students" }
+    ].map(c => `<div class="stat-card"><div class="label">${c.label}</div><div class="value">${c.value}</div></div>`).join("");
+    const rows = CACHE.fees.slice(0, 6);
+    document.getElementById("recentFeesBody").innerHTML = rows.length ? rows.map(f => `<tr><td>${f.studentName}</td><td>${f.classId}</td><td>${f.month}</td><td>₹${f.amount}</td><td>${f.paidOn ? fmtDate(f.paidOn) : "—"}</td></tr>`).join("") : emptyRow(5, "No fee payments recorded yet");
+  }
+
+  function renderTeachers() {
+    const body = document.getElementById("teachersBody");
+    body.innerHTML = CACHE.teachers.length ? CACHE.teachers.map(t => `<tr><td><strong>${t.name}</strong></td><td>${t.email}</td><td>${(t.classes || []).join(", ") || "—"}</td><td>${t.phone || "—"}</td><td><button class="btn btn-danger btn-sm" data-remove-teacher="${t.id}">Remove</button></td></tr>`).join("") : emptyRow(5, 'No teachers yet — click "Add Teacher" to create one');
+    body.querySelectorAll("[data-remove-teacher]").forEach(btn => btn.onclick = async () => {
+      if (!confirm("Remove this teacher's profile? (Auth login still needs manual deletion in Firebase Console.)")) return;
+      await deleteDoc(doc(db, "users", btn.dataset.removeTeacher)); toast("Teacher profile removed"); refreshAll();
+    });
+  }
+
+  async function onCreateTeacher(e) {
+    e.preventDefault();
+    const btn = document.getElementById("teacherSubmitBtn");
+    const name = document.getElementById("tName").value.trim();
+    const email = document.getElementById("tEmail").value.trim();
+    const pass = document.getElementById("tPass").value;
+    const phone = document.getElementById("tPhone").value.trim();
+    const classes = Array.from(document.getElementById("tClasses").selectedOptions).map(o => o.value);
+    btn.disabled = true; btn.textContent = "Creating…";
+    try {
+      const secondaryAuth = getSecondaryAuth();
+      const cred = await createUserWithEmailAndPassword(secondaryAuth, email, pass);
+      await signOut(secondaryAuth);
+      await setDoc(doc(db, "users", cred.user.uid), { role: "teacher", name, email, phone, classes, createdAt: serverTimestamp() });
+      toast(`Teacher account created for ${name}`); closeModal("teacherModalBg"); e.target.reset(); refreshAll();
+    } catch (err) {
+      console.error(err);
+      toast(err.code === "auth/email-already-in-use" ? "That email is already registered." : "Could not create account.", true);
+    } finally { btn.disabled = false; btn.textContent = "Create Teacher Account"; }
+  }
+
+  function renderStudents() {
+    const filter = document.getElementById("studentClassFilter").value;
+    const body = document.getElementById("studentsBody");
+    const thisMonth = monthKey();
+    const list = CACHE.students.filter(s => !filter || s.class === filter);
+    body.innerHTML = list.length ? list.map(s => {
+      const paid = CACHE.fees.some(f => f.studentId === s.id && f.month === thisMonth);
+      return `<tr><td><strong>${s.name}</strong>${s.hasLogin ? "" : ' <span class="badge badge-muted">no login</span>'}</td><td>${s.class}</td><td>${s.guardianName || "—"}</td><td>${s.guardianPhone || "—"}</td><td>${paid ? '<span class="badge badge-success">Paid — ' + thisMonth + '</span>' : '<span class="badge badge-warn">Due — ' + thisMonth + '</span>'}</td><td><button class="btn btn-danger btn-sm" data-remove-student="${s.id}">Remove</button></td></tr>`;
+    }).join("") : emptyRow(6, "No students in this view yet");
+    body.querySelectorAll("[data-remove-student]").forEach(btn => btn.onclick = async () => {
+      if (!confirm("Remove this student's profile?")) return;
+      await deleteDoc(doc(db, "users", btn.dataset.removeStudent)); toast("Student profile removed"); refreshAll();
+    });
+  }
+
+  async function onCreateStudent(e) {
+    e.preventDefault();
+    const btn = document.getElementById("studentSubmitBtn");
+    const name = document.getElementById("sNameField").value.trim();
+    const className = document.getElementById("sClass").value;
+    const guardianName = document.getElementById("sGuardian").value.trim();
+    const guardianPhone = document.getElementById("sPhone").value.trim();
+    const email = document.getElementById("sEmailField").value.trim();
+    const pass = document.getElementById("sPassField").value;
+    btn.disabled = true; btn.textContent = "Saving…";
+    try {
+      const payload = { role: "student", name, class: className, guardianName, guardianPhone, hasLogin: !!email, email: email || null, createdAt: serverTimestamp() };
+      if (email && pass) {
+        const secondaryAuth = getSecondaryAuth();
+        const cred = await createUserWithEmailAndPassword(secondaryAuth, email, pass);
+        await signOut(secondaryAuth);
+        await setDoc(doc(db, "users", cred.user.uid), payload);
+      } else {
+        await addDoc(collection(db, "users"), payload);
+      }
+      toast(`${name} registered successfully`); closeModal("studentModalBg"); e.target.reset(); refreshAll();
+    } catch (err) {
+      console.error(err);
+      toast(err.code === "auth/email-already-in-use" ? "That login email is already registered." : "Could not register student.", true);
+    } finally { btn.disabled = false; btn.textContent = "Register Student"; }
+  }
+
+  function populateFeeStudentSelect() {
+    document.getElementById("fStudent").innerHTML = CACHE.students.map(s => `<option value="${s.id}" data-name="${s.name}" data-class="${s.class}">${s.name} — ${s.class}</option>`).join("");
+    document.getElementById("fMonth").value = monthKey();
+  }
+
+  async function onCollectFee(e) {
+    e.preventDefault();
+    const btn = document.getElementById("feeSubmitBtn");
+    const sel = document.getElementById("fStudent");
+    const opt = sel.selectedOptions[0];
+    const month = document.getElementById("fMonth").value;
+    const amount = document.getElementById("fAmount").value;
+    btn.disabled = true; btn.textContent = "Saving…";
+    try {
+      await addDoc(collection(db, "fees"), { studentId: sel.value, studentName: opt.dataset.name, classId: opt.dataset.class, month, amount: Number(amount), status: "paid", paidOn: new Date().toISOString(), receivedBy: ME.name || ME.email });
+      toast("Payment recorded"); closeModal("feeModalBg"); e.target.reset(); refreshAll();
+    } catch (err) { console.error(err); toast("Could not save payment.", true); }
+    finally { btn.disabled = false; btn.textContent = "Mark as Paid"; }
+  }
+
+  function renderFees() {
+    const monthFilter = document.getElementById("feeMonthFilter").value;
+    const list = CACHE.fees.filter(f => !monthFilter || f.month === monthFilter);
+    document.getElementById("feesBody").innerHTML = list.length ? list.map(f => `<tr><td>${f.studentName}</td><td>${f.classId}</td><td>${f.month}</td><td>₹${f.amount}</td><td><span class="badge badge-success">Paid</span></td><td>${f.paidOn ? fmtDate(f.paidOn) : "—"}</td></tr>`).join("") : emptyRow(6, "No payments recorded for this month");
+  }
+
+  function renderAttendance() {
+    const filter = document.getElementById("attClassFilterA").value;
+    const list = CACHE.attendance.filter(a => !filter || a.classId === filter).slice(0, 30);
+    document.getElementById("attendanceBody").innerHTML = list.length ? list.map(a => {
+      const values = Object.values(a.records || {});
+      const present = values.filter(v => v === "present").length, absent = values.filter(v => v === "absent").length, leave = values.filter(v => v === "leave").length;
+      const pct = Math.round((present / (values.length || 1)) * 100);
+      return `<tr><td>${a.classId}</td><td>${fmtDate(a.date)}</td><td><span class="badge badge-success">${present}</span></td><td><span class="badge badge-danger">${absent}</span></td><td><span class="badge badge-warn">${leave}</span></td><td>${pct}%</td></tr>`;
+    }).join("") : emptyRow(6, "No attendance marked yet");
+  }
+
+  function renderHomework() {
+    document.getElementById("homeworkBodyA").innerHTML = CACHE.homework.length ? CACHE.homework.map(h => `<tr><td>${h.classId}</td><td>${h.subject}</td><td>${h.title}</td><td>${h.dueDate ? fmtDate(h.dueDate) : "—"}</td><td>${h.createdByName || "—"}</td></tr>`).join("") : emptyRow(5, "No homework posted yet");
+  }
+
+  refreshAll();
+}
+
+// ================================================================
+// TEACHER
+// ================================================================
+function initTeacher(ME) {
+  document.getElementById("tWhoName").textContent = ME.name || "Teacher";
+  document.getElementById("tWhoEmail").textContent = ME.email;
+  document.getElementById("tDateNow").textContent = new Date().toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+  wireNav(document.getElementById("appTeacher"));
+
+  const myClasses = ME.classes || [];
+  document.getElementById("attClassSelect").innerHTML = myClasses.map(c => `<option>${c}</option>`).join("");
+  document.getElementById("hwClass").innerHTML = myClasses.map(c => `<option>${c}</option>`).join("");
+  document.getElementById("studClassFilter").innerHTML = `<option value="">All my classes</option>` + myClasses.map(c => `<option>${c}</option>`).join("");
+  document.getElementById("hwSubject").innerHTML = SUBJECTS.map(s => `<option>${s}</option>`).join("");
+  document.getElementById("attDate").value = todayStr();
+
+  let STUDENTS = [];
+  let ATT_STATE = {};
+
+  async function loadStudents() {
+    if (!myClasses.length) { STUDENTS = []; return; }
+    const snap = await getDocs(query(collection(db, "users"), where("role", "==", "student")));
+    STUDENTS = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(s => myClasses.includes(s.class));
+  }
+
+  async function renderAttendanceRoster() {
+    const classId = document.getElementById("attClassSelect").value;
+    const date = document.getElementById("attDate").value;
+    document.getElementById("attDateLabel").textContent = classId ? `${classId} — ${fmtDate(date)}` : "Select a class";
+    const body = document.getElementById("attBody");
+    const roster = STUDENTS.filter(s => s.class === classId);
+    ATT_STATE = {};
+    try {
+      const existing = await getDoc(doc(db, "attendance", `${classId}__${date}`.replace(/\s+/g, "_")));
+      if (existing.exists()) ATT_STATE = { ...existing.data().records };
+    } catch (e) {}
+    body.innerHTML = roster.length ? roster.map(s => `<tr><td><strong>${s.name}</strong></td>
+      <td style="text-align:center;"><button class="att-btn p ${ATT_STATE[s.id] === "present" ? "on" : ""}" data-id="${s.id}" data-status="present">✓</button></td>
+      <td style="text-align:center;"><button class="att-btn a ${ATT_STATE[s.id] === "absent" ? "on" : ""}" data-id="${s.id}" data-status="absent">✕</button></td>
+      <td style="text-align:center;"><button class="att-btn l ${ATT_STATE[s.id] === "leave" ? "on" : ""}" data-id="${s.id}" data-status="leave">L</button></td></tr>`).join("") : `<tr><td colspan="4" class="empty">No students registered in this class yet</td></tr>`;
+    body.querySelectorAll(".att-btn").forEach(btn => btn.addEventListener("click", () => {
+      const { id, status } = btn.dataset;
+      ATT_STATE[id] = status;
+      body.querySelectorAll(`[data-id="${id}"]`).forEach(b => b.classList.remove("on"));
+      btn.classList.add("on");
+    }));
+  }
+
+  async function saveAttendance() {
+    const classId = document.getElementById("attClassSelect").value;
+    const date = document.getElementById("attDate").value;
+    if (!classId) { toast("Select a class first", true); return; }
+    const roster = STUDENTS.filter(s => s.class === classId);
+    if (!roster.length) { toast("No students in this class", true); return; }
+    const records = {};
+    roster.forEach(s => { if (ATT_STATE[s.id]) records[s.id] = ATT_STATE[s.id]; });
+    if (Object.keys(records).length < roster.length && !confirm("Some students aren't marked yet. Save anyway?")) return;
+    const btn = document.getElementById("saveAttBtn");
+    btn.disabled = true; btn.textContent = "Saving…";
+    try {
+      await setDoc(doc(db, "attendance", `${classId}__${date}`.replace(/\s+/g, "_")), { classId, date, records, markedBy: ME.name || ME.email, markedAt: serverTimestamp() });
+      toast("Attendance saved");
+    } catch (err) { console.error(err); toast("Could not save attendance", true); }
+    finally { btn.disabled = false; btn.textContent = "Save Attendance"; }
+  }
+
+  async function onPostHomework(e) {
+    e.preventDefault();
+    const btn = document.getElementById("hwSubmitBtn");
+    const classId = document.getElementById("hwClass").value;
+    const subject = document.getElementById("hwSubject").value;
+    const title = document.getElementById("hwTitle").value.trim();
+    const description = document.getElementById("hwDesc").value.trim();
+    const dueDate = document.getElementById("hwDue").value;
+    const file = document.getElementById("hwFile").files[0];
+    btn.disabled = true; btn.textContent = "Posting…";
+    try {
+      let fileUrl = null, fileName = null;
+      if (file) {
+        const storageRef = ref(storage, `homework/${classId}/${Date.now()}_${file.name}`);
+        await uploadBytes(storageRef, file);
+        fileUrl = await getDownloadURL(storageRef);
+        fileName = file.name;
+      }
+      await addDoc(collection(db, "homework"), { classId, subject, title, description, dueDate, fileUrl, fileName, createdBy: ME.uid, createdByName: ME.name || ME.email, createdAt: serverTimestamp() });
+      toast("Homework posted"); e.target.reset(); await renderHomeworkList();
+    } catch (err) { console.error(err); toast("Could not post homework", true); }
+    finally { btn.disabled = false; btn.textContent = "Post Homework"; }
+  }
+
+  async function renderHomeworkList() {
+    const body = document.getElementById("hwBodyT");
+    if (!myClasses.length) { body.innerHTML = `<tr><td colspan="5" class="empty">No classes assigned</td></tr>`; return; }
+    const snap = await getDocs(query(collection(db, "homework"), where("classId", "in", myClasses.slice(0, 10)), orderBy("createdAt", "desc")));
+    const rows = snap.docs.map(d => d.data());
+    body.innerHTML = rows.length ? rows.map(h => `<tr><td>${h.classId}</td><td>${h.subject}</td><td>${h.title}</td><td>${h.dueDate ? fmtDate(h.dueDate) : "—"}</td><td>${h.fileUrl ? `<a href="${h.fileUrl}" target="_blank" class="file-chip">📎 ${h.fileName || "file"}</a>` : "—"}</td></tr>`).join("") : `<tr><td colspan="5" class="empty">No homework posted yet</td></tr>`;
+  }
+
+  function renderStudentsPanel() {
+    const filter = document.getElementById("studClassFilter").value;
+    const list = STUDENTS.filter(s => !filter || s.class === filter);
+    document.getElementById("studBody").innerHTML = list.length ? list.map(s => `<tr><td><strong>${s.name}</strong></td><td>${s.class}</td><td>${s.guardianName || "—"}</td><td>${s.guardianPhone || "—"}</td></tr>`).join("") : `<tr><td colspan="4" class="empty">No students found</td></tr>`;
+  }
+
+  document.getElementById("attClassSelect").addEventListener("change", renderAttendanceRoster);
+  document.getElementById("attDate").addEventListener("change", renderAttendanceRoster);
+  document.getElementById("saveAttBtn").addEventListener("click", saveAttendance);
+  document.getElementById("homeworkForm").addEventListener("submit", onPostHomework);
+  document.getElementById("studClassFilter").addEventListener("change", renderStudentsPanel);
+
+  (async () => {
+    await loadStudents();
+    await renderAttendanceRoster();
+    renderStudentsPanel();
+    await renderHomeworkList();
+  })();
+}
+
+// ================================================================
+// STUDENT
+// ================================================================
+function initStudent(ME) {
+  document.getElementById("sWhoName").textContent = ME.name || "Student";
+  document.getElementById("sWhoEmail").textContent = ME.email;
+  document.getElementById("classLabelS").textContent = ME.class || "";
+  document.getElementById("sDateNow").textContent = new Date().toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+  wireNav(document.getElementById("appStudent"));
+
+  async function loadAttendance() {
+    const snap = await getDocs(query(collection(db, "attendance"), where("classId", "==", ME.class), orderBy("date", "desc")));
+    return snap.docs.map(d => d.data()).filter(a => a.records && a.records[ME.uid]).map(a => ({ date: a.date, status: a.records[ME.uid] }));
+  }
+  async function loadHomework() {
+    const snap = await getDocs(query(collection(db, "homework"), where("classId", "==", ME.class), orderBy("createdAt", "desc")));
+    return snap.docs.map(d => d.data());
+  }
+  async function loadFees() {
+    const snap = await getDocs(query(collection(db, "fees"), where("studentId", "==", ME.uid), orderBy("paidOn", "desc")));
+    return snap.docs.map(d => d.data());
+  }
+  function badge(status) {
+    if (status === "present") return '<span class="badge badge-success">Present</span>';
+    if (status === "absent") return '<span class="badge badge-danger">Absent</span>';
+    if (status === "leave") return '<span class="badge badge-warn">Leave</span>';
+    return "—";
+  }
+
+  (async () => {
+    const [attendance, homework, fees] = await Promise.all([loadAttendance(), loadHomework(), loadFees()]);
+
+    const total = attendance.length || 1;
+    const present = attendance.filter(a => a.status === "present").length;
+    const pct = attendance.length ? Math.round((present / total) * 100) : 0;
+    const thisMonth = monthKey();
+    const feePaid = fees.some(f => f.month === thisMonth);
+    document.getElementById("sStatGrid").innerHTML = `
+      <div class="stat-card"><div class="label">Attendance</div><div class="value">${pct}%</div><div class="sub">${present} of ${attendance.length} days present</div></div>
+      <div class="stat-card"><div class="label">Homework Posted</div><div class="value">${homework.length}</div><div class="sub">total assignments</div></div>
+      <div class="stat-card"><div class="label">Fee — ${thisMonth}</div><div class="value">${feePaid ? "Paid" : "Due"}</div></div>`;
+
+    const upcoming = homework.filter(h => !h.dueDate || new Date(h.dueDate) >= new Date(new Date().toDateString())).slice(0, 5);
+    document.getElementById("upcomingHwBody").innerHTML = upcoming.length ? upcoming.map(h => `<tr><td>${h.subject}</td><td>${h.title}</td><td>${h.dueDate ? fmtDate(h.dueDate) : "—"}</td></tr>`).join("") : `<tr><td colspan="3" class="empty">Nothing due right now</td></tr>`;
+
+    document.getElementById("sAttBody").innerHTML = attendance.length ? attendance.map(a => `<tr><td>${fmtDate(a.date)}</td><td>${badge(a.status)}</td></tr>`).join("") : `<tr><td colspan="2" class="empty">No attendance records yet</td></tr>`;
+
+    document.getElementById("sHwBody").innerHTML = homework.length ? homework.map(h => `<tr><td>${h.subject}</td><td>${h.title}</td><td>${h.description || "—"}</td><td>${h.dueDate ? fmtDate(h.dueDate) : "—"}</td><td>${h.fileUrl ? `<a href="${h.fileUrl}" target="_blank" class="file-chip">📎 ${h.fileName || "file"}</a>` : "—"}</td></tr>`).join("") : `<tr><td colspan="5" class="empty">No homework posted yet</td></tr>`;
+
+    document.getElementById("sFeeBody").innerHTML = fees.length ? fees.map(f => `<tr><td>${f.month}</td><td>₹${f.amount}</td><td><span class="badge badge-success">Paid</span></td><td>${f.paidOn ? fmtDate(f.paidOn) : "—"}</td></tr>`).join("") : `<tr><td colspan="4" class="empty">No fee records yet</td></tr>`;
+  })();
+}
+</script>
+</body>
+</html>
